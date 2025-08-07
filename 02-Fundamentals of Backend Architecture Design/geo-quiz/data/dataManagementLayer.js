@@ -19,4 +19,4 @@ async function readQuestions() {
     return await readDataRoutines(QUESTIONS);
 }
 
-module.exports.readClasses = readQuestions;
+module.exports.readQuestions = readQuestions;
