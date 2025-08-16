@@ -1,6 +1,6 @@
 const express = require("express");
 const dml = require("../data/dataManagementLayer");
-const quizProcessor = require("../bl/quizProcessor");
+const quizProcessor = require("../abl/quizProcessor");
 
 const router = express.Router();
 

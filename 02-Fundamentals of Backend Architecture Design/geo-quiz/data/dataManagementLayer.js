@@ -1,5 +1,5 @@
-//const fs = require('node:fs/promises');
-const fs = require('fs').promises;
+const fs = require('node:fs/promises');
+//const fs = require('fs').promises;
 const path = require("path");
 
 const rootPath = path.dirname(process.mainModule.filename);
@@ -19,4 +19,4 @@ async function readQuestions() {
     return await readDataRoutines(QUESTIONS);
 }
 
-module.exports.readClasses = readQuestions;
+module.exports.readQuestions = readQuestions;
