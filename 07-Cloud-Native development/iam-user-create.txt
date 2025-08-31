@@ -1,0 +1,122 @@
+Got it 👍 You want to create an **IAM user** (or role) that has access to only one specific S3 bucket, and then use its credentials in another application. Here’s a step-by-step guide:
+
+---
+
+## 1. Sign in to AWS Management Console
+
+* Log in as a user with permissions to manage **IAM** and **S3**.
+
+---
+
+## 2. Create a New IAM User
+
+1. Go to **IAM → Users → Add users**.
+2. Enter a **user name** (e.g. `app-s3-user`).
+3. Select **Access key – Programmatic access** (needed for apps, SDK, CLI).
+4. Click **Next: Permissions**.
+
+---
+
+## 3. Create a Policy for Your S3 Bucket
+
+1. In the **Set permissions** step, choose **Attach policies directly → Create policy**.
+2. Select **JSON** and paste a policy like this (replace `YOUR_BUCKET_NAME`):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+    }
+  ]
+}
+```
+
+👉 This allows:
+
+* listing bucket contents
+* reading, writing, deleting objects in that bucket only
+
+3. Save the policy (give it a clear name, e.g. `S3Access-SpecificBucket`).
+
+---
+
+## 4. Attach Policy to User
+
+* Back in the user creation wizard, **attach** the new policy you created.
+* Click **Next** until you can **Create user**.
+
+---
+
+## 5. Obtain Access Credentials
+
+* After creation, you’ll see:
+
+  * **Access Key ID**
+  * **Secret Access Key** (only shown once, download the `.csv` file!)
+* These credentials are what you put into your application.
+
+---
+
+## 6. Configure the Application
+
+Depending on your environment:
+
+### a) AWS CLI (test access)
+
+```bash
+aws configure
+AWS Access Key ID [None]: <your-access-key-id>
+AWS Secret Access Key [None]: <your-secret-access-key>
+Default region name [None]: us-east-1
+Default output format [None]: json
+```
+
+Then test:
+
+```bash
+aws s3 ls s3://YOUR_BUCKET_NAME
+```
+
+### b) SDK Example (Node.js)
+
+```javascript
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: "us-east-1"
+});
+
+async function readFile() {
+  const data = await s3.getObject({
+    Bucket: "YOUR_BUCKET_NAME",
+    Key: "example.txt"
+  }).promise();
+
+  console.log(data.Body.toString());
+}
+
+readFile();
+```
+
+---
+
+✅ That’s it — you now have an IAM user restricted to a single bucket with credentials to use in another app.
+
+Do you want me to also show how to do this using **AWS CLI commands** instead of the console?
